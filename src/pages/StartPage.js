@@ -2,7 +2,9 @@ import React from 'react';
 
 function StartPage() {
   return (
-    <div>StartPage</div>
+  <h1 className="text-5xl font-bold underline">
+    Start Page
+  </h1>
   )
 }
 
