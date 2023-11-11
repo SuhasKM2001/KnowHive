@@ -2,7 +2,10 @@ import React from 'react';
 
 function StartPage() {
   return (
-    <div>StartPage</div>
+    <div className="bg-primary">
+      Hello
+    </div>
+
   )
 }
 
