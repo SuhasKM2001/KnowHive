@@ -1,11 +1,12 @@
-// import './App.css';
-import {BrowserRouter, Routes, Route} from "react-router-dom";
+import {BrowserRouter, Routes, Route, useLocation} from "react-router-dom";
+import {AnimatePresence} from "framer-motion";
 import StartPage from "./pages/StartPage";
 import ChatPage from "./pages/ChatPage";
 
 function App() {
+  // const location = useLocation();
   return (
-    <div>
+    <AnimatePresence mode='wait'>
       <BrowserRouter>
       <Routes>
         <Route index element= {<StartPage />} />
@@ -13,7 +14,7 @@ function App() {
         <Route path="/chat" element={<ChatPage />} />
       </Routes>
       </BrowserRouter>
-    </div>
+      </AnimatePresence>
   );
 }
 
