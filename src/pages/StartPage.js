@@ -8,7 +8,7 @@ function StartPage() {
   const navigate = useNavigate();
 
   const handleButtonClick = () => {
-    navigate("/chat");
+    navigate("/login");
   };
 
   const textVariants = {
