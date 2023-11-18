@@ -1,4 +1,4 @@
-import {BrowserRouter, Routes, Route, useLocation} from "react-router-dom";
+import {BrowserRouter, Routes, Route} from "react-router-dom";
 import {AnimatePresence} from "framer-motion";
 import StartPage from "./pages/StartPage";
 import ChatPage from "./pages/ChatPage";
@@ -6,7 +6,6 @@ import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 
 function App() {
-  // const location = useLocation();
   return (
     <AnimatePresence mode='wait'>
       <BrowserRouter>
