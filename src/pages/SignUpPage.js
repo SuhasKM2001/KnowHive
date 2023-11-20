@@ -26,12 +26,15 @@ function SignUpPage() {
     if (!confirmPassword.trim()) {
       validationErrors.confirmPassword = "Re-enter of password is required";
     }
+    if(confirmPassword !== password){
+      validationErrors.confirmPassword = "Password not matched";
+    }
 
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length === 0) {
       navigate("/login");
-      alert("Form Submitted Successfully");
+      alert("Account Created Successfully");
     }
   };
 
