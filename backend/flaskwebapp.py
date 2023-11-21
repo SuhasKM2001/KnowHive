@@ -24,7 +24,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 app.config['SECRET_KEY'] = 'State2244'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:State%402244@localhost/conversation_history'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:suhas987@localhost/conversation_history'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -138,7 +138,7 @@ class ConversationHistory(db.Model):
 with app.app_context():
     db.create_all()
 
-df = pd.read_csv('D:\internship\KnowHive\Field Engineer dataset.csv')
+df = pd.read_csv('D:\KnowHive_GPT_Data\Field Engineer dataset.csv')
 df = df.dropna()
 input_data = df['Incident Description'].tolist()
 target_data = df['Resolution Steps'].tolist()

@@ -26,7 +26,20 @@ function SignUpPage() {
     if (!password.trim()) {
       validationErrors.password = "Password is required";
     } else if (!/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}/.test(password)) {
-      validationErrors.password = "Password must contain at least one uppercase letter, one lowercase letter, one number, one special character, and be at least 8 characters long";
+      const passwordRequirements = [
+        "Password must contain one Uppercase Letter",
+        "one Lowercase Letter",
+        "one Number",
+        "one Special Character",
+        "Should be 8 characters long",
+      ];
+      validationErrors.password = (
+        <div className="text-left mx-4 text-xs mb-1 text-red-500">
+          {passwordRequirements.map((requirement, index) => (
+            <p key={index}>{requirement}</p>
+          ))}
+        </div>
+      );
     }
   
     if (!confirmPassword.trim()) {
@@ -51,7 +64,6 @@ function SignUpPage() {
           alert("Account Created Successfully");
           navigate("/login"); // Navigate to the login page upon successful signup
         } else {
-          // Handle other response statuses as needed
           console.error("Signup failed");
         }
       } catch (error) {
@@ -72,6 +84,7 @@ function SignUpPage() {
   setErrors(validationErrors);
 }
 };
+
   const objectVariants = {
     hidden: {
       opacity: 0,
@@ -106,7 +119,7 @@ function SignUpPage() {
                 type="text"
                 placeholder="User Name"
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full h-full box-border rounded px-7 py-2 focus:outline-none"
+                className="w-full h-full rounded px-7 py-2 focus:outline-none"
               />
             </div>
             {errors.username && (
@@ -121,7 +134,7 @@ function SignUpPage() {
                 type={visible ? "text" : "password"}
                 placeholder="Password"
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full h-full box-border rounded px-7 py-2 focus:outline-none"
+                className="w-full h-full rounded px-7 py-2 focus:outline-none"
               />
               <div onClick={() => setVisible(!visible)}>
                 {visible ? (
@@ -143,7 +156,7 @@ function SignUpPage() {
                 type={confirmPasswordVisible ? "text" : "password"}
                 placeholder="Confirm Password"
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full h-full box-border rounded px-7 py-2 focus:outline-none"
+                className="w-full h-full rounded px-7 py-2 focus:outline-none"
               />
               <div
                 onClick={() =>
