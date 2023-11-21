@@ -3,28 +3,44 @@ import Logo from "../assests/knowhiveLogo.png";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
-
   const [errors, setErrors] = useState({});
+  
+  // Use 'useNavigate' from 'react-router-dom'
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const validationErrors = {};
-    if (!username.trim()) {
-      validationErrors.username = "Username is required";
-    }
-    if (!password.trim()) {
-      validationErrors.password = "Password is required";
-    }
-
-    setErrors(validationErrors);
-
-    if (Object.keys(validationErrors).length === 0) {
-      alert("Form Submitted Successfully");
+    const formData = {
+      username,
+      password,
+    };
+  
+    try {
+      const response = await fetch("http://127.0.0.1:5000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+  
+      if (response.ok) {
+        //alert("Login Successful");
+        navigate("/chat")
+        // Redirect or perform other actions upon successful login
+      } else {
+        alert(data.error || "Login failed");
+        // Handle login failure, show error message
+      }
+    } catch (error) {
+      console.error("Error:", error);
     }
   };
 

@@ -21,3 +21,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+/incident_model
+/incident_model_checkpoint
+train.txt
