@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Logo from "../assests/knowhiveLogo.png";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -10,9 +10,17 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
   const [errors, setErrors] = useState({});
-  
+
   // Use 'useNavigate' from 'react-router-dom'
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if user is already logged in from localStorage
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      navigate("/chat");
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,7 +28,7 @@ function LoginPage() {
       username,
       password,
     };
-  
+
     try {
       const response = await fetch("http://127.0.0.1:5000/login", {
         method: "POST",
@@ -30,11 +38,14 @@ function LoginPage() {
         body: JSON.stringify(formData),
       });
       const data = await response.json();
-  
+
       if (response.ok) {
         //alert("Login Successful");
-        navigate("/chat")
-        // Redirect or perform other actions upon successful login
+        // Save user data to localStorage
+        localStorage.setItem("user", JSON.stringify(formData));
+
+        // Redirect to chat page
+        navigate("/chat");
       } else {
         alert(data.error || "Login failed");
         // Handle login failure, show error message
