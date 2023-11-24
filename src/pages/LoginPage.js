@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Logo from "../assests/knowhiveLogo.png";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -24,11 +25,21 @@ function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const validationErrors = {};
     const formData = {
       username,
       password,
     };
 
+    if (!username.trim()) {
+      validationErrors.username = "Username is required";
+    }
+  
+    if (!password.trim()) {
+      validationErrors.password = "Password is required";
+    } 
+  
+    if (Object.keys(validationErrors).length === 0) {
     try {
       const response = await fetch("http://127.0.0.1:5000/login", {
         method: "POST",
@@ -40,12 +51,10 @@ function LoginPage() {
       const data = await response.json();
 
       if (response.ok) {
-        //alert("Login Successful");
-        // Save user data to localStorage
+         // Save user data to localStorage
         localStorage.setItem("user", JSON.stringify(formData));
-
-        // Redirect to chat page
-        navigate("/chat");
+        navigate("/chat")
+        // Redirect or perform other actions upon successful login
       } else {
         alert(data.error || "Login failed");
         // Handle login failure, show error message
@@ -53,6 +62,10 @@ function LoginPage() {
     } catch (error) {
       console.error("Error:", error);
     }
+  }else {
+    // Update the errors state with validation errors
+    setErrors(validationErrors);
+  }
   };
 
   const objectVariants = {
