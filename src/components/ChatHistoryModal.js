@@ -77,45 +77,7 @@ function ChatHistoryModal({ isVisible, onClose }) {
               </div>
               <div>
                 <p className="font-poppins">
-                  Occaecat officia velit reprehenderit minim voluptate ea eu
-                  mollit pariatur id. Qui ullamco incididunt veniam id culpa
-                  aliquip elit cillum ut sit ullamco ad deserunt. Ullamco eu
-                  nulla labore laborum occaecat.
-                  Occaecat officia velit reprehenderit minim voluptate ea eu
-                  mollit pariatur id. Qui ullamco incididunt veniam id culpa
-                  aliquip elit cillum ut sit ullamco ad deserunt. Ullamco eu
-                  nulla labore laborum occaecat.Occaecat officia velit reprehenderit minim voluptate ea eu
-                  mollit pariatur id. Qui ullamco incididunt veniam id culpa
-                  aliquip elit cillum ut sit ullamco ad deserunt. Ullamco eu
-                  nulla labore laborum occaecat.Occaecat officia velit reprehenderit minim voluptate ea eu
-                  mollit pariatur id. Qui ullamco incididunt veniam id culpa
-                  aliquip elit cillum ut sit ullamco ad deserunt. Ullamco eu
-                  nulla labore laborum occaecat.Occaecat officia velit reprehenderit minim voluptate ea eu
-                  mollit pariatur id. Qui ullamco incididunt veniam id culpa
-                  aliquip elit cillum ut sit ullamco ad deserunt. Ullamco eu
-                  nulla labore laborum occaecat.
-                  Occaecat officia velit reprehenderit minim voluptate ea eu
-                  mollit pariatur id. Qui ullamco incididunt veniam id culpa
-                  aliquip elit cillum ut sit ullamco ad deserunt. Ullamco eu
-                  nulla labore laborum occaecat.Occaecat officia velit reprehenderit minim voluptate ea eu
-                  mollit pariatur id. Qui ullamco incididunt veniam id culpa
-                  aliquip elit cillum ut sit ullamco ad deserunt. Ullamco eu
-                  nulla labore laborum occaecat.Occaecat officia velit reprehenderit minim voluptate ea eu
-                  mollit pariatur id. Qui ullamco incididunt veniam id culpa
-                  aliquip elit cillum ut sit ullamco ad deserunt. Ullamco eu
-                  nulla labore laborum occaecat.Occaecat officia velit reprehenderit minim voluptate ea eu
-                  mollit pariatur id. Qui ullamco incididunt veniam id culpa
-                  aliquip elit cillum ut sit ullamco ad deserunt. Ullamco eu
-                  nulla labore laborum occaecat.Occaecat officia velit reprehenderit minim voluptate ea eu
-                  mollit pariatur id. Qui ullamco incididunt veniam id culpa
-                  aliquip elit cillum ut sit ullamco ad deserunt. Ullamco eu
-                  nulla labore laborum occaecat.Occaecat officia velit reprehenderit minim voluptate ea eu
-                  mollit pariatur id. Qui ullamco incididunt veniam id culpa
-                  aliquip elit cillum ut sit ullamco ad deserunt. Ullamco eu
-                  nulla labore laborum occaecat.Occaecat officia velit reprehenderit minim voluptate ea eu
-                  mollit pariatur id. Qui ullamco incididunt veniam id culpa
-                  aliquip elit cillum ut sit ullamco ad deserunt. Ullamco eu
-                  nulla labore laborum occaecat.
+                  Answer 
                 </p>
               </div>
             </div>
