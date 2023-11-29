@@ -24,7 +24,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 app.config['SECRET_KEY'] = 'State2244'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:State%402244@localhost/conversation_history'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:suhas987@localhost/conversation_history'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -138,7 +138,7 @@ class ConversationHistory(db.Model):
 with app.app_context():
     db.create_all()
 
-df = pd.read_csv('D:\internship\KnowHive\Field Engineer dataset.csv')
+df = pd.read_csv('D:\KnowHive_GPT_Data\Field Engineer dataset.csv')
 df = df.dropna()
 input_data = df['Incident Description'].tolist()
 target_data = df['Resolution Steps'].tolist()
@@ -210,17 +210,11 @@ def display_conversation_history():
     # Filter conversation history for the current user
     conversation_history = ConversationHistory.query.filter_by(user_id=user_id).all()
 
-    # history_str = ""
-    # for i, entry in enumerate(conversation_history, 1):
-    #     history_str += f"{i}. Question: {entry.question}\n   Answer: {entry.answer}\n"
+    history_str = ""
+    for i, entry in enumerate(conversation_history, 1):
+        history_str += f"{i}. Question: {entry.question}\n   Answer: {entry.answer}\n"
 
-    # return history_str
-
-    history_list = []
-    for entry in conversation_history:
-        history_list.append({'question': entry.question, 'answer': entry.answer})
-
-    return history_list
+    return history_str
     
 def format_sections(text):
     # Split the text into sentences
@@ -265,7 +259,6 @@ def generate_answer(question):
 def index():
     conversation_history_str = display_conversation_history()
     return render_template('index.html', conversation_history=conversation_history_str)
-
 @app.route('/ask', methods=['GET', 'POST'])
 @login_required
 def ask():
@@ -280,13 +273,10 @@ def ask():
         user_conversation_history = ConversationHistory.query.filter_by(user_id=current_user.id).order_by(ConversationHistory.id.desc()).first()
         if user_conversation_history:
             # Display only the answer of the current ask question
-            # return render_template('webpage.html', current_answer=new_answer["answer"])
-            return jsonify({'question': new_answer["question"], 'answer': new_answer["answer"]})
-        
+            return render_template('webpage.html', current_answer=new_answer["answer"])
 
     # If no question has been asked yet, render the template without displaying any answer
-    # return render_template('webpage.html', current_answer=None)
-    return jsonify({})
+    return render_template('webpage.html', current_answer=None)
 
 
 if __name__ == '__main__':
