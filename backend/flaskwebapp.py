@@ -210,11 +210,17 @@ def display_conversation_history():
     # Filter conversation history for the current user
     conversation_history = ConversationHistory.query.filter_by(user_id=user_id).all()
 
-    history_str = ""
-    for i, entry in enumerate(conversation_history, 1):
-        history_str += f"{i}. Question: {entry.question}\n   Answer: {entry.answer}\n"
+    # history_str = ""
+    # for i, entry in enumerate(conversation_history, 1):
+    #     history_str += f"{i}. Question: {entry.question}\n   Answer: {entry.answer}\n"
 
-    return history_str
+    # return history_str
+
+    history_list = []
+    for entry in conversation_history:
+        history_list.append({'question': entry.question, 'answer': entry.answer})
+
+    return history_list
     
 def format_sections(text):
     # Split the text into sentences
@@ -259,6 +265,7 @@ def generate_answer(question):
 def index():
     conversation_history_str = display_conversation_history()
     return render_template('index.html', conversation_history=conversation_history_str)
+
 @app.route('/ask', methods=['GET', 'POST'])
 @login_required
 def ask():
@@ -273,10 +280,13 @@ def ask():
         user_conversation_history = ConversationHistory.query.filter_by(user_id=current_user.id).order_by(ConversationHistory.id.desc()).first()
         if user_conversation_history:
             # Display only the answer of the current ask question
-            return render_template('webpage.html', current_answer=new_answer["answer"])
+            # return render_template('webpage.html', current_answer=new_answer["answer"])
+            return jsonify({'question': new_answer["question"], 'answer': new_answer["answer"]})
+        
 
     # If no question has been asked yet, render the template without displaying any answer
-    return render_template('webpage.html', current_answer=None)
+    # return render_template('webpage.html', current_answer=None)
+    return jsonify({})
 
 
 if __name__ == '__main__':

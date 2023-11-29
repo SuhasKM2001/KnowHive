@@ -1,10 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import ChatHistoryModal from "../components/ChatHistoryModal";
+import { useState } from "react";
 
 function ChatPage() {
   const navigate = useNavigate();
-  
+  const [showModal, setShowModal] = useState(false);
+
   const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/login");
@@ -21,6 +24,16 @@ function ChatPage() {
           >
             Logout
           </button>
+
+          <button
+        onClick={() =>setShowModal(true)}
+            className="border font-poppins text-base bg-secondary text-white  mt-2 mb-1 p-3 text-center rounded-full"
+          >
+            Chat History
+          </button>
+
+          <ChatHistoryModal isVisible={showModal} onClose={() => setShowModal(false)}/>
+
       </div>
     </motion.div>
   );
