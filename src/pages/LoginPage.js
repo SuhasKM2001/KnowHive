@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Logo from "../assests/knowhiveLogo.png";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -10,7 +11,8 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
   const [errors, setErrors] = useState({});
-  
+
+  // Use 'useNavigate' from 'react-router-dom'
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -47,7 +49,7 @@ function LoginPage() {
         body: JSON.stringify(formData),
       });
       const data = await response.json();
-  
+
       if (response.ok) {
          // Save user data to localStorage
         localStorage.setItem("user", JSON.stringify(formData));
