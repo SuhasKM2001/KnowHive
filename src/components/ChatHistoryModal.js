@@ -1,36 +1,8 @@
 import React from "react";
 import Logo from "../assests/knowhiveLogo.png";
 import userLogo from "../assests/UserLogo.png";
-import { useState, useEffect } from "react";
 
 function ChatHistoryModal({ isVisible, onClose }) {
-  const [chatHistory, setChatHistory] = useState([]);
-
-  const fetchChatHistory = async () => {
-    try {
-      const response = await fetch("/ask", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch chat history");
-      }
-
-      const data = await response.json();
-      setChatHistory(data);
-    } catch (error) {
-      console.error("Error fetching chat history:", error.message);
-    }
-  };
-
-  useEffect(() => {
-    if (isVisible) {
-      fetchChatHistory();
-    }
-  }, [isVisible]);
 
   if (!isVisible) {
     return null;
@@ -78,6 +50,79 @@ function ChatHistoryModal({ isVisible, onClose }) {
               <div>
                 <p className="font-poppins">
                   Answer 
+                  Ad velit sit incididunt voluptate consectetur
+                  incididunt ex veniam tempor. Sit proident do ullamco pariatur
+                  ex pariatur. Dolor commodo pariatur ea magna eiusmod mollit
+                  pariatur enim est qui consectetur qui incididunt. Ad consequat
+                  nostrud adipisicing et voluptate est. Veniam aliqua enim in
+                  ipsum exercitation eu elit pariatur. Est et aliqua adipisicing
+                  sit dolore laboris labore ex cillum occaecat consectetur
+                  dolor.
+                  Ad velit sit incididunt voluptate consectetur
+                  incididunt ex veniam tempor. Sit proident do ullamco pariatur
+                  ex pariatur. Dolor commodo pariatur ea magna eiusmod mollit
+                  pariatur enim est qui consectetur qui incididunt. Ad consequat
+                  nostrud adipisicing et voluptate est. Veniam aliqua enim in
+                  ipsum exercitation eu elit pariatur. Est et aliqua adipisicing
+                  sit dolore laboris labore ex cillum occaecat consectetur
+                  dolor.
+                  Ad velit sit incididunt voluptate consectetur
+                  incididunt ex veniam tempor. Sit proident do ullamco pariatur
+                  ex pariatur. Dolor commodo pariatur ea magna eiusmod mollit
+                  pariatur enim est qui consectetur qui incididunt. Ad consequat
+                  nostrud adipisicing et voluptate est. Veniam aliqua enim in
+                  ipsum exercitation eu elit pariatur. Est et aliqua adipisicing
+                  sit dolore laboris labore ex cillum occaecat consectetur
+                  dolor. Ad velit sit incididunt voluptate consectetur
+                  incididunt ex veniam tempor. Sit proident do ullamco pariatur
+                  ex pariatur. Dolor commodo pariatur ea magna eiusmod mollit
+                  pariatur enim est qui consectetur qui incididunt. Ad consequat
+                  nostrud adipisicing et voluptate est. Veniam aliqua enim in
+                  ipsum exercitation eu elit pariatur. Est et aliqua adipisicing
+                  sit dolore laboris labore ex cillum occaecat consectetur
+                  dolor. Ad velit sit incididunt voluptate consectetur
+                  incididunt ex veniam tempor. Sit proident do ullamco pariatur
+                  ex pariatur. Dolor commodo pariatur ea magna eiusmod mollit
+                  pariatur enim est qui consectetur qui incididunt. Ad consequat
+                  nostrud adipisicing et voluptate est. Veniam aliqua enim in
+                  ipsum exercitation eu elit pariatur. Est et aliqua adipisicing
+                  sit dolore laboris labore ex cillum occaecat consectetur
+                  dolor. Ad velit sit incididunt voluptate consectetur
+                  incididunt ex veniam tempor. Sit proident do ullamco pariatur
+                  ex pariatur. Dolor commodo pariatur ea magna eiusmod mollit
+                  pariatur enim est qui consectetur qui incididunt. Ad consequat
+                  nostrud adipisicing et voluptate est. Veniam aliqua enim in
+                  ipsum exercitation eu elit pariatur. Est et aliqua adipisicing
+                  sit dolore laboris labore ex cillum occaecat consectetur
+                  dolor. Ad velit sit incididunt voluptate consectetur
+                  incididunt ex veniam tempor. Sit proident do ullamco pariatur
+                  ex pariatur. Dolor commodo pariatur ea magna eiusmod mollit
+                  pariatur enim est qui consectetur qui incididunt. Ad consequat
+                  nostrud adipisicing et voluptate est. Veniam aliqua enim in
+                  ipsum exercitation eu elit pariatur. Est et aliqua adipisicing
+                  sit dolore laboris labore ex cillum occaecat consectetur
+                  dolor. Ad velit sit incididunt voluptate consectetur
+                  incididunt ex veniam tempor. Sit proident do ullamco pariatur
+                  ex pariatur. Dolor commodo pariatur ea magna eiusmod mollit
+                  pariatur enim est qui consectetur qui incididunt. Ad consequat
+                  nostrud adipisicing et voluptate est. Veniam aliqua enim in
+                  ipsum exercitation eu elit pariatur. Est et aliqua adipisicing
+                  sit dolore laboris labore ex cillum occaecat consectetur
+                  dolor. Ad velit sit incididunt voluptate consectetur
+                  incididunt ex veniam tempor. Sit proident do ullamco pariatur
+                  ex pariatur. Dolor commodo pariatur ea magna eiusmod mollit
+                  pariatur enim est qui consectetur qui incididunt. Ad consequat
+                  nostrud adipisicing et voluptate est. Veniam aliqua enim in
+                  ipsum exercitation eu elit pariatur. Est et aliqua adipisicing
+                  sit dolore laboris labore ex cillum occaecat consectetur
+                  dolor. Ad velit sit incididunt voluptate consectetur
+                  incididunt ex veniam tempor. Sit proident do ullamco pariatur
+                  ex pariatur. Dolor commodo pariatur ea magna eiusmod mollit
+                  pariatur enim est qui consectetur qui incididunt. Ad consequat
+                  nostrud adipisicing et voluptate est. Veniam aliqua enim in
+                  ipsum exercitation eu elit pariatur. Est et aliqua adipisicing
+                  sit dolore laboris labore ex cillum occaecat consectetur
+                  dolor.
                 </p>
               </div>
             </div>

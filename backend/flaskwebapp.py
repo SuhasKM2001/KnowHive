@@ -237,7 +237,8 @@ def generate_answer(question):
         input_text = question
 
         # Assuming current_user.id is the user_id
-        user_id = current_user.id
+        #user_id = current_user.id
+        user_id=3
 
     
 
@@ -251,33 +252,33 @@ def generate_answer(question):
         answer = format_sections(answer)
 
         # Update the conversation history with the generated answer
-        update_conversation_history(user_id=user_id, question=question, answer=answer)
+        #update_conversation_history(user_id=user_id, question=question, answer=answer)
 
-        return {'question': question, 'answer': answer}
+        #return {'question': question, 'answer': answer}
+        return answer
+    
+def login_optional(func):
+    setattr(func, '_login_optional', True)
+    return func 
+
 @app.route('/')
 @login_required
 def index():
     conversation_history_str = display_conversation_history()
     return render_template('index.html', conversation_history=conversation_history_str)
-@app.route('/ask', methods=['GET', 'POST'])
-@login_required
+
+# Define the login_optional decorator
+def login_optional(func):
+    setattr(func, '_login_optional', True)
+    return func
+
+@app.route('/ask', methods=['POST'])
+@login_optional
 def ask():
-    if request.method == 'POST':
-        new_incident_description = request.form['incident_description']
-        new_answer = generate_answer(new_incident_description)
+    new_incident_description = request.get_json()
+    new_answer = generate_answer(new_incident_description['question'])
 
-        save_conversation_history()
-    
-
-        # Fetch only the most recent conversation history entry for the user
-        user_conversation_history = ConversationHistory.query.filter_by(user_id=current_user.id).order_by(ConversationHistory.id.desc()).first()
-        if user_conversation_history:
-            # Display only the answer of the current ask question
-            return render_template('webpage.html', current_answer=new_answer["answer"])
-
-    # If no question has been asked yet, render the template without displaying any answer
-    return render_template('webpage.html', current_answer=None)
-
+    return jsonify({"Answer":new_answer})
 
 if __name__ == '__main__':
     app.run(debug=True)
