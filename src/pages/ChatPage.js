@@ -1,18 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
-// import { useNavigate } from "react-router-dom";
 import Eng from "../assests/engineer-removebg-preview.png";
 import Logo from "../assests/knowhiveLogo.png";
 import userLogo from "../assests/UserLogo.png";
 import { motion } from "framer-motion";
 import axios from "axios";
-// import ChatHistoryModal from "../components/ChatHistoryModal";
+import ChatHistoryModal from "../components/ChatHistoryModal";
 import { IoMdSend } from "react-icons/io";
-// import { useState } from "react";
+import DropDownList from "../components/DropDownList";
 
 function ChatPage() {
   const msgEnd = useRef(null);
-  // const navigate = useNavigate();
-  // const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [openDropDown, setOpenDropDown] = useState(false);
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState([
     {
@@ -24,11 +23,6 @@ function ChatPage() {
   useEffect(() => {
     msgEnd.current.scrollIntoView();
   }, [messages]);
-
-  // const handleLogout = () => {
-  //   localStorage.removeItem("user");
-  //   navigate("/login");
-  // };
 
   const handleSend = () => {
     const text = question;
@@ -66,27 +60,16 @@ function ChatPage() {
       transition={{ duration: 0.5 }}
     >
       <div>
-        {/* <button
-        onClick={handleLogout}
-            className="border font-poppins text-base bg-secondary text-white  mt-2 mb-1 p-3 text-center rounded-full"
-          >
-            Logout
-          </button>
+        {
+          openDropDown && <DropDownList setShowModal={setShowModal}/>
+        }
 
-          <button
-        onClick={() =>setShowModal(true)}
-            className="border font-poppins text-base bg-secondary text-white  mt-2 mb-1 p-3 text-center rounded-full"
-          >
-            Chat History
-          </button> */}
-
-        <div className="absolute right-6 top-1">
+        <div className="absolute right-6 top-1" onClick={() => setOpenDropDown((prev)=> !prev)}>
           <img
             src={Eng}
             alt="User Icon"
             width="42"
             height={100}
-            onClick={console.log("Image Clicked")}
           />
         </div>
 
@@ -137,10 +120,12 @@ function ChatPage() {
           </div>
         </div>
 
-        {/* <ChatHistoryModal
+        <ChatHistoryModal
           isVisible={showModal}
           onClose={() => setShowModal(false)}
-        /> */}
+        />
+
+        
       </div>
     </motion.div>
   );
