@@ -5,6 +5,7 @@ import StartPage from "./pages/StartPage";
 import ChatPage from "./pages/ChatPage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
+import AboutUsPage from "./pages/AboutUsPage";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/start" element={<StartPage />} />
         <Route element={<ProtectedRoute />}>
         <Route path="/chat" element={<ChatPage />} />
+        <Route path="/about-us" element={<AboutUsPage />} />
         </Route>
         <Route path="/login" element={<LoginPage/>} />
         <Route path="/signup" element={<SignUpPage/>} />
@@ -23,5 +25,6 @@ function App() {
       </AnimatePresence>
   );
 }
+
 
 export default App;

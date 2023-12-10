@@ -50,8 +50,17 @@ function LoginPage() {
       const data = await response.json();
 
       if (response.ok) {
+        response.headers.forEach((i,j)=>console.log(j,i));
+        for(var i of response.headers.values()){
+          console.log(i);
+        }
+
+        console.log(data);
+        console.log(response.headers.getSetCookie())
+        console.log('I am not insane')
          // Save user data to localStorage
         localStorage.setItem("user", JSON.stringify(formData));
+        localStorage.setItem("token", data['token']);
         navigate("/chat")
         // Redirect or perform other actions upon successful login
       } else {

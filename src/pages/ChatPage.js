@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import Eng from "../assests/engineer-removebg-preview.png";
 import Logo from "../assests/knowhiveLogo.png";
 import userLogo from "../assests/UserLogo.png";
@@ -6,12 +7,21 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import ChatHistoryModal from "../components/ChatHistoryModal";
 import { IoMdSend } from "react-icons/io";
-import DropDownList from "../components/DropDownList";
+import { IoMdMic } from "react-icons/io";
+import { BiSolidLike, BiSolidDislike } from "react-icons/bi";
+import backgroundImage from "../assests/chatBackground.jpg";
+import VideoModal from "../components/VideoModal";
+
+const backgroundStyle = {
+  backgroundImage: `url(${backgroundImage})`,
+  backgroundSize: "cover",
+  backgroundRepeat: "no-repeat",
+  imageRendering: "smooth",
+};
 
 function ChatPage() {
   const msgEnd = useRef(null);
-  const [showModal, setShowModal] = useState(false);
-  const [openDropDown, setOpenDropDown] = useState(false);
+  const navigate = useNavigate();
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState([
     {
@@ -20,36 +30,139 @@ function ChatPage() {
     },
   ]);
 
-  useEffect(() => {
-    msgEnd.current.scrollIntoView();
-  }, [messages]);
+  const [showModal, setShowModal] = useState(false);
+  const [showVideoModal, setShowVideoModal] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const recognition = new (window.SpeechRecognition ||
+    window.webkitSpeechRecognition ||
+    window.mozSpeechRecognition ||
+    window.msSpeechRecognition)();
+  const [botResponse, setBotResponse] = useState(null);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isDisliked, setIsDisliked] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
 
-  const handleSend = () => {
+  const handleLikeClick = () => {
+    setIsLiked(true);
+    setIsDisliked(false);
+  };
+
+  const handleDislikeClick = () => {
+    setIsLiked(false);
+    setIsDisliked(true);
+  };
+
+  useEffect(() => {
+    recognition.onresult = (event) => {
+      const last = event.results.length - 1;
+      const question = event.results[last][0].transcript;
+      setQuestion(question);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+  });
+
+  const startListening = () => {
+    const recognition = new (window.SpeechRecognition ||
+      window.webkitSpeechRecognition ||
+      window.mozSpeechRecognition ||
+      window.msSpeechRecognition)();
+
+    recognition.onresult = (event) => {
+      const last = event.results.length - 1;
+      const question = event.results[last][0].transcript;
+      setQuestion(question);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognition.onstart = () => {
+      setIsListening(true);
+    };
+
+    recognition.start();
+  };
+
+  const handleSend = async () => {
     const text = question;
     setQuestion("");
-    setMessages([...messages, { text, isBot: false }]);
-    console.log("Axios is working");
-    console.log("Question:", text);
-    axios
-      .post(`http://127.0.0.1:5000/ask`, {
-        question: question,
-      })
-      .then((response) => {
-        console.log("Response recieved:", response);
-        const answer = response.data.Answer;
-        setMessages([
-          ...messages,
-          { text, isBot: false },
-          { text: answer, isBot: true },
-        ]);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+
+    // const storedUser = JSON.parse(localStorage.getItem("user"));
+    const token = localStorage.getItem("token");
+
+    const userMessage = {
+      text: text,
+      isBot: false,
+    };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:5000/ask",
+        {
+          question: text,
+        },
+        {
+          headers: {
+            Auth: token,
+          },
+        }
+      );
+
+      const answer = response.data.message;
+
+      const botResponse = {
+        text: answer,
+        isBot: true,
+        reactions: { thumbsUp: 0, thumbsDown: 0 },
+      };
+
+      // Use a separate state to handle the bot response asynchronously
+      setBotResponse(botResponse);
+
+      // Use the native Web Speech API to speak the answer
+      if (!isMuted) {
+        const synth = window.speechSynthesis;
+        const utterance = new SpeechSynthesisUtterance(answer);
+        synth.speak(utterance);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    if (isListening) {
+      recognition.stop();
+      setIsListening(false);
+    }
   };
+  useEffect(() => {
+    if (
+      botResponse &&
+      !messages.some((msg) => msg.text === botResponse.text && msg.isBot)
+    ) {
+      setMessages((prevMessages) => [...prevMessages, botResponse]);
+    }
+  }, [botResponse, messages]);
 
   const handleEnter = async (e) => {
     if (e.key === "Enter") await handleSend();
+  };
+
+  const handleDropdownToggle = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
+
+  const closeDropdown = () => {
+    setShowDropdown(false);
   };
 
   return (
@@ -58,26 +171,71 @@ function ChatPage() {
       animate={{ scaleY: 1 }}
       exit={{ scaleY: 0 }}
       transition={{ duration: 0.5 }}
+      onPointerLeave={closeDropdown}
     >
       <div>
-        {
-          openDropDown && <DropDownList setShowModal={setShowModal}/>
-        }
-
-        <div className="absolute right-6 top-1" onClick={() => setOpenDropDown((prev)=> !prev)}>
+        <div className="absolute right-6 top-1">
           <img
             src={Eng}
             alt="User Icon"
             width="42"
             height={100}
+            onClick={() => {
+              handleDropdownToggle();
+            }}
+            className="cursor-pointer"
           />
+          {showDropdown && (
+            <div
+              className="absolute top-14 right-0 bg-[#FFFFFF] border border-gray-400 rounded-md shadow-md p-2 w-32"
+              style={{ zIndex: 10 }}
+            >
+              <div className="flex flex-col items-center dropdownlist">
+                <button
+                  onClick={() => setShowModal(true)}
+                  className="border font-poppins font-bold text-sm text-black p-2 border-none"
+                >
+                  Chat History
+                </button>
+
+                <button
+                  onClick={() => setShowVideoModal(true)}
+                  className="border font-poppins font-bold text-sm  text-black p-2 border-none"
+                >
+                  Video Demo
+                </button>
+
+                <Link
+                  to="/about-us"
+                  className="border font-poppins font-bold text-sm text-black p-2 border-none"
+                >
+                  About Us
+                </Link>
+
+                <button
+                  onClick={handleLogout}
+                  className="border font-poppins font-bold text-sm text-black p-2 border-none"
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Chat prompt */}
-        <div className="min-h-[calc(100vh-6rem)] max-h-[calc(100vh-6rem)] m-12 flex flex-col bg-[#F8F8F8] rounded-2xl p-2 border-gray-300">
+        <div
+          className="min-h-[calc(100vh-6rem)] max-h-[calc(100vh-6rem)] m-12 flex flex-col bg-[#F8F8F8] rounded-2xl p-2 border-gray-300"
+          style={{ ...backgroundStyle, zIndex: 9 }}
+        >
           <div className="flex flex-col overflow-y-auto scroll-smooth custom-scrollbar pl-12 pr-12">
             {messages.map((message, i) => (
-              <div key={i} className="flex p-2 ">
+              <div
+                key={i}
+                className={`flex p-2 ${
+                  message.isBot ? "bot-message" : "user-message"
+                }`}
+              >
                 <div className="shrink-0 w-8 ml-1 mr-2">
                   <img
                     src={message.isBot ? Logo : userLogo}
@@ -86,17 +244,42 @@ function ChatPage() {
                   />
                 </div>
                 <div
-                  className={
-                    message.isBot
-                      ? "text-justify w-full border bg-[#ABC2AE] rounded-lg p-2"
-                      : "text-justify w-full border bg-[#83AF8C] rounded-lg p-2"
-                  }
+                  className={`text-justify ${
+                    message.isBot ? "bot-bubble" : "user-bubble"
+                  }`}
                 >
                   {message.text.split("\n").map((line, index) => (
                     <p key={index} className="font-poppins">
                       {line}
                     </p>
                   ))}
+
+                  {
+                    <div className="flex mt-2">
+                      {message.isBot && message.reactions && (
+                        <div className="flex">
+                          <BiSolidLike
+                            className={`text-lg ml-2 mr-2 cursor-pointer ${
+                              isLiked ? "text-[#668c6e]" : "text-[#c9e1cd]"
+                            }`}
+                            onClick={handleLikeClick}
+                          />
+                          <BiSolidDislike
+                            className={`text-lg mr-2 cursor-pointer ${
+                              isDisliked ? "text-[#668c6e]" : "text-[#c9e1cd]"
+                            }`}
+                            onClick={handleDislikeClick}
+                          />
+                          <button
+                            className="text-2xl text-[#ABC2AE] hover:text-[#83AF8C] cursor-pointer ml-1"
+                            onClick={() => setIsMuted(!isMuted)}
+                          >
+                            {isMuted ? "Unmute" : "Mute"}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  }
                 </div>
               </div>
             ))}
@@ -105,13 +288,21 @@ function ChatPage() {
 
           <div className="mt-auto w-full flex flex-col items-center">
             <div className="flex w-4/6 items-center pt-2">
-              <textarea
-                className="w-full resize-none border border-gray-500 rounded-xl p-1 "
-                placeholder="Enter your question here"
-                value={question}
-                onKeyDown={handleEnter}
-                onChange={(e) => setQuestion(e.target.value)}
-              />
+              <div className="flex w-full items-center border border-gray-500 bg-white rounded-xl p-1 focus-within:border-black focus-within:ring-1 focus-within:ring-black">
+                <textarea
+                  className="w-full resize-none outline-none"
+                  placeholder="Enter your question here"
+                  value={question}
+                  onKeyDown={handleEnter}
+                  onChange={(e) => setQuestion(e.target.value)}
+                />
+                <IoMdMic
+                  className={`text-2xl text-black hover:text-[#83AF8C] cursor-pointer ml-1 ${
+                    isListening ? "text-red-500" : ""
+                  }`}
+                  onClick={startListening}
+                />
+              </div>
               <IoMdSend
                 className="text-3xl text-[#ABC2AE] hover:text-[#83AF8C] cursor-pointer ml-1"
                 onClick={handleSend}
@@ -124,9 +315,62 @@ function ChatPage() {
           isVisible={showModal}
           onClose={() => setShowModal(false)}
         />
-
-        
+        <VideoModal
+          isVideoVisible={showVideoModal}
+          onVideoClose={() => setShowVideoModal(false)}
+        />
       </div>
+
+      <style>
+        {`
+        .user-message {
+            justify-content: flex-end; /* Updated to flex-end to align user messages to the right */
+        }
+
+        .user-bubble {
+            position: relative;
+            background-color: #83AF8C; /* User bubble color */
+            color: white; /* Text color for user messages */
+            border-radius: 15px 15px 15px 4px; /* Border radius for the user bubble */
+            padding: 10px; /* Padding for the user bubble */
+            text-align: right; /* Align text to the right */
+        }
+
+        .user-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -18px; /* Adjust the position of the tail */
+            border-width: 20px 20px 0; /* Adjust the size of the tail */
+            border-style: solid;
+            border-color: #83AF8C transparent transparent transparent; /* Set the tail color to match the user bubble */
+        }
+
+        .bot-message {
+            justify-content: flex-start; /* Updated to flex-start to align bot messages to the left */
+        }
+
+        .bot-bubble {
+            position: relative;
+            background-color: #ABC2AE; /* Bot bubble color */
+            color: black; /* Text color for bot messages */
+            border-radius: 15px 15px 15px 15px; /* Border radius for the bot bubble */
+            padding: 10px; /* Padding for the bot bubble */
+            text-align: left; /* Align text to the left */
+        }
+
+        .bot-bubble::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: -15px; /* Adjust the position of the tail */
+            border-width: 15px 15px 0; /* Adjust the size of the tail */
+            border-style: solid;
+            border-color: #ABC2AE transparent transparent transparent; /* Set the tail color to match the bot bubble */
+        }
+    `}
+      </style>
     </motion.div>
   );
 }

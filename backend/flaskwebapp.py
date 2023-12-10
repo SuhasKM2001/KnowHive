@@ -3,7 +3,7 @@ from transformers import GPT2LMHeadModel, GPT2Tokenizer, Trainer, TrainingArgume
 from transformers import DataCollatorForLanguageModeling, LineByLineTextDataset
 import torch
 import os
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, render_template, request
 from flask import current_app
@@ -18,7 +18,10 @@ from flask import flash
 import re
 from wtforms.validators import DataRequired, ValidationError, EqualTo
 from flask_cors import CORS
+from flask_session import Session
+from functools import wraps
 
+import jwt
 
 
 app = Flask(__name__)
@@ -26,7 +29,10 @@ CORS(app)
 app.config['SECRET_KEY'] = 'State2244'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:suhas987@localhost/conversation_history'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SESSION_TYPE'] = 'filesystem'  # Configure Flask-Session
+Session(app)
 db = SQLAlchemy(app)
+
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -73,32 +79,49 @@ class SignUpForm(FlaskForm):
             raise ValidationError('Username is already in use. Please choose a different one.')
 
 
+def m_login_required(f):
+    @wraps(f)
+    def auth_handler(*args,**kwargs):
+        if 'Auth' in request.headers:
+            try:
+                token = jwt.decode(request.headers['Auth']
+                                   ,app.config['SECRET_KEY']
+                                   ,algorithms=['HS256'])
+                user = User.query.filter_by(username=token['username']).first()
+                login_user(user)
+            except Exception as err:
+                print(err)
+                return jsonify({"message":"unauthorized"}),401
+            return f(*args,**kwargs)
+        return jsonify({"message":"no token"}),401
+    return auth_handler
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    data = request.get_json()
-
-    # Extract data from the JSON payload
-    username = data.get('username')
-    password = data.get('password')
-
-    user = User.query.filter_by(username=username).first()
-
-    if user and check_password_hash(user.password_hash, password):
-        login_user(user)
-        return jsonify({'message': 'Login successful'}), 200
+    if request.method == 'POST':
+        data = request.get_json()
+        # Extract data from the JSON payload
+        username = data.get('username')
+        password = data.get('password')
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password_hash, password):
+            token = jwt.encode({
+                'username':username
+            }, app.config['SECRET_KEY'],algorithm='HS256')
+            return jsonify({'message': 'Login successful','token':token}), 200
+        else:
+            return jsonify({'error': 'Invalid username or password'}), 401
     else:
-        return jsonify({'error': 'Invalid username or password'}), 401
-
-
+        # Handle GET requests (e.g., render a login page)
+        return jsonify({'message': 'This is the login page.'}), 200
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.get_json()
-
-
     # Extract data from the JSON payload
     username = data.get('username')
     password = data.get('password')
@@ -210,12 +233,14 @@ def display_conversation_history():
     # Filter conversation history for the current user
     conversation_history = ConversationHistory.query.filter_by(user_id=user_id).all()
 
-    history_str = ""
+    history_list = []
     for i, entry in enumerate(conversation_history, 1):
-        history_str += f"{i}. Question: {entry.question}\n   Answer: {entry.answer}\n"
+        history_list.append({
+            'question': entry.question,
+            'answer': entry.answer
+        })
 
-    return history_str
-    
+    return history_list
 def format_sections(text):
     # Split the text into sentences
     sentences = [sentence.strip() for sentence in text.split('.') if sentence.strip()]
@@ -228,23 +253,21 @@ def format_sections(text):
     main_heading = sentences[0].strip()
 
     # Format each sentence with a hyphen and a new line after the question mark
-    formatted_output = f"{main_heading}:\n" + "\n".join([f"- {sentence.strip()}\n" if '?' in sentence else f"- {sentence.strip()}." for sentence in sentences[1:]])
+    formatted_output = "\n".join([f"- {sentence.strip()}\n" if '?' in sentence else f"- {sentence.strip()}." for sentence in sentences[1:]])
 
     return formatted_output.strip()
 
 def generate_answer(question):
     with app.app_context():
+        if question is None:
+            return {'error': 'Question cannot be None'}
+
         input_text = question
-
         # Assuming current_user.id is the user_id
-        #user_id = current_user.id
-        user_id=3
-
-    
-
+        user_id = current_user.id
         input_ids = tokenizer.encode(input_text, return_tensors='pt', max_length=50, truncation=True)
         attention_mask = torch.ones(input_ids.shape, dtype=torch.long) 
-        response = model.generate(input_ids, max_length=100, num_return_sequences=1, no_repeat_ngram_size=2, top_k=50, top_p=0.95, temperature=0.7, do_sample=True, pad_token_id=model.config.eos_token_id)
+        response = model.generate(input_ids, max_length=100, num_return_sequences=1, no_repeat_ngram_size=2, top_k=50, top_p=0.95, temperature=0.2, do_sample=True, pad_token_id=model.config.eos_token_id)
 
         answer = tokenizer.decode(response[0], skip_special_tokens=True)
 
@@ -252,33 +275,45 @@ def generate_answer(question):
         answer = format_sections(answer)
 
         # Update the conversation history with the generated answer
-        #update_conversation_history(user_id=user_id, question=question, answer=answer)
+        update_conversation_history(user_id=user_id, question=question, answer=answer)
 
-        #return {'question': question, 'answer': answer}
-        return answer
+        return {'question': question, 'answer': answer}
+
+
+@app.route('/conversation-history', methods=['GET'])
+@m_login_required
+def get_conversation_history():
+    if current_user.is_authenticated:
+        conversation_history_list = display_conversation_history()
+        return jsonify({'history': conversation_history_list})
+    else:
+        return jsonify({'error': 'User not authenticated'}), 401
     
-def login_optional(func):
-    setattr(func, '_login_optional', True)
-    return func 
-
-@app.route('/')
-@login_required
-def index():
-    conversation_history_str = display_conversation_history()
-    return render_template('index.html', conversation_history=conversation_history_str)
-
-# Define the login_optional decorator
-def login_optional(func):
-    setattr(func, '_login_optional', True)
-    return func
-
-@app.route('/ask', methods=['POST'])
-@login_optional
+@app.route('/ask', methods=['GET', 'POST'])
+@m_login_required
 def ask():
-    new_incident_description = request.get_json()
-    new_answer = generate_answer(new_incident_description['question'])
+    if request.method == 'POST':
+        data = request.get_json()
+        new_incident_description = data['question']
+        if new_incident_description is None:
+            return jsonify({"erroe":'error is description'}),404
+        new_answer = generate_answer(new_incident_description)
+        
 
-    return jsonify({"Answer":new_answer})
+        # Fetch only the most recent conversation history entry for the user
+        user_conversation_history = ConversationHistory.query.filter_by(user_id=current_user.id).order_by(ConversationHistory.id.desc()).first()
+        if user_conversation_history:
+            # Return the answer in the response
+            return jsonify({'message': new_answer["answer"]}), 200
+        else:
+            return jsonify({'error': 'No conversation history found'}), 404
+
+    # If no question has been asked yet, return an error
+    return jsonify({'error': 'Invalid request'}), 400
+
 
 if __name__ == '__main__':
     app.run(debug=True)
+    
+    
+    

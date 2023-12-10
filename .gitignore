@@ -23,4 +23,5 @@ yarn-debug.log*
 yarn-error.log*
 /incident_model
 /incident_model_checkpoint
+/flask_session
 train.txt
