@@ -55,9 +55,9 @@ function LoginPage() {
           console.log(i);
         }
 
-        console.log(data);
-        console.log(response.headers.getSetCookie())
-        console.log('I am not insane')
+        // console.log(data);
+        // console.log(response.headers.getSetCookie())
+        // console.log('I am not insane')
          // Save user data to localStorage
         localStorage.setItem("user", JSON.stringify(formData));
         localStorage.setItem("token", data['token']);

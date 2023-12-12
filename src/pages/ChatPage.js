@@ -8,6 +8,7 @@ import axios from "axios";
 import ChatHistoryModal from "../components/ChatHistoryModal";
 import { IoMdSend } from "react-icons/io";
 import { IoMdMic } from "react-icons/io";
+import { PiSpeakerHighFill } from "react-icons/pi";
 import { BiSolidLike, BiSolidDislike } from "react-icons/bi";
 import backgroundImage from "../assests/chatBackground.jpg";
 import VideoModal from "../components/VideoModal";
@@ -41,7 +42,9 @@ function ChatPage() {
   const [botResponse, setBotResponse] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const [isDisliked, setIsDisliked] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
+  const [utterance, setUtterance] = useState(null);
+  const [speakOutAnswer, setSpeakOutAnswer] = useState("");
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
   const handleLikeClick = () => {
     setIsLiked(true);
@@ -52,6 +55,11 @@ function ChatPage() {
     setIsLiked(false);
     setIsDisliked(true);
   };
+
+  useEffect(()=>{
+    msgEnd.current.scrollIntoView();
+  },[messages]);
+
 
   useEffect(() => {
     recognition.onresult = (event) => {
@@ -115,6 +123,7 @@ function ChatPage() {
       );
 
       const answer = response.data.message;
+      setSpeakOutAnswer(answer);
 
       const botResponse = {
         text: answer,
@@ -122,15 +131,7 @@ function ChatPage() {
         reactions: { thumbsUp: 0, thumbsDown: 0 },
       };
 
-      // Use a separate state to handle the bot response asynchronously
       setBotResponse(botResponse);
-
-      // Use the native Web Speech API to speak the answer
-      if (!isMuted) {
-        const synth = window.speechSynthesis;
-        const utterance = new SpeechSynthesisUtterance(answer);
-        synth.speak(utterance);
-      }
     } catch (error) {
       console.error(error);
     }
@@ -164,6 +165,37 @@ function ChatPage() {
   const closeDropdown = () => {
     setShowDropdown(false);
   };
+
+  const handleNarrationClick = () => {
+    const synth = window.speechSynthesis;
+    if (isSpeaking) {
+      if (synth.speaking) {
+        synth.cancel();
+        setIsSpeaking(false);
+      }
+    } else {
+      const newUtterance = new SpeechSynthesisUtterance(speakOutAnswer);
+      setUtterance(newUtterance);
+      synth.speak(newUtterance);
+      setIsSpeaking(true);
+    }
+  };
+
+  useEffect(() => {
+    const handleEnd = () => {
+      setIsSpeaking(false);
+    };
+
+    if (utterance) {
+      utterance.addEventListener("end", handleEnd);
+    }
+
+    return () => {
+      if (utterance) {
+        utterance.removeEventListener("end", handleEnd);
+      }
+    };
+  }, [utterance]);
 
   return (
     <motion.div
@@ -248,6 +280,16 @@ function ChatPage() {
                     message.isBot ? "bot-bubble" : "user-bubble"
                   }`}
                 >
+                  {message.isBot && message.reactions && (
+                    <div className="flex justify-end">
+                      <PiSpeakerHighFill
+                        className={`text-lg cursor-pointer ${
+                          isSpeaking ? "active" : ""
+                        }`}
+                        onClick={handleNarrationClick}
+                      />
+                    </div>
+                  )}
                   {message.text.split("\n").map((line, index) => (
                     <p key={index} className="font-poppins">
                       {line}
@@ -270,12 +312,6 @@ function ChatPage() {
                             }`}
                             onClick={handleDislikeClick}
                           />
-                          <button
-                            className="text-2xl text-[#ABC2AE] hover:text-[#83AF8C] cursor-pointer ml-1"
-                            onClick={() => setIsMuted(!isMuted)}
-                          >
-                            {isMuted ? "Unmute" : "Mute"}
-                          </button>
                         </div>
                       )}
                     </div>
@@ -289,8 +325,8 @@ function ChatPage() {
           <div className="mt-auto w-full flex flex-col items-center">
             <div className="flex w-4/6 items-center pt-2">
               <div className="flex w-full items-center border border-gray-500 bg-white rounded-xl p-1 focus-within:border-black focus-within:ring-1 focus-within:ring-black">
-                <textarea
-                  className="w-full resize-none outline-none"
+                <input type = "text"
+                  className="w-full p-2 resize-none outline-none"
                   placeholder="Enter your question here"
                   value={question}
                   onKeyDown={handleEnter}
