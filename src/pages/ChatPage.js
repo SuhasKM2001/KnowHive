@@ -12,6 +12,7 @@ import { PiSpeakerHighFill } from "react-icons/pi";
 import { BiSolidLike, BiSolidDislike } from "react-icons/bi";
 import backgroundImage from "../assests/chatBackground.jpg";
 import VideoModal from "../components/VideoModal";
+import ChatSkeleton from "../components/ChatSkeleton";
 
 const backgroundStyle = {
   backgroundImage: `url(${backgroundImage})`,
@@ -45,6 +46,7 @@ function ChatPage() {
   const [utterance, setUtterance] = useState(null);
   const [speakOutAnswer, setSpeakOutAnswer] = useState("");
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isLoading, setisLoading] = useState(false);
 
   const handleLikeClick = () => {
     setIsLiked(true);
@@ -56,10 +58,9 @@ function ChatPage() {
     setIsDisliked(true);
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     msgEnd.current.scrollIntoView();
-  },[messages]);
-
+  }, [messages]);
 
   useEffect(() => {
     recognition.onresult = (event) => {
@@ -99,7 +100,7 @@ function ChatPage() {
   const handleSend = async () => {
     const text = question;
     setQuestion("");
-
+    setisLoading(true);
     // const storedUser = JSON.parse(localStorage.getItem("user"));
     const token = localStorage.getItem("token");
 
@@ -135,6 +136,8 @@ function ChatPage() {
     } catch (error) {
       console.error(error);
     }
+    setisLoading(false);
+
     if (isListening) {
       recognition.stop();
       setIsListening(false);
@@ -275,6 +278,7 @@ function ChatPage() {
                     className="w-full"
                   />
                 </div>
+
                 <div
                   className={`text-justify ${
                     message.isBot ? "bot-bubble" : "user-bubble"
@@ -320,12 +324,14 @@ function ChatPage() {
               </div>
             ))}
             <div ref={msgEnd} />
+            {isLoading && <ChatSkeleton />}
           </div>
 
           <div className="mt-auto w-full flex flex-col items-center">
             <div className="flex w-4/6 items-center pt-2">
               <div className="flex w-full items-center border border-gray-500 bg-white rounded-xl p-1 focus-within:border-black focus-within:ring-1 focus-within:ring-black">
-                <input type = "text"
+                <input
+                  type="text"
                   className="w-full p-2 resize-none outline-none"
                   placeholder="Enter your question here"
                   value={question}
