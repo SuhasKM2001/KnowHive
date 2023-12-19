@@ -9,7 +9,6 @@ import ChatHistoryModal from "../components/ChatHistoryModal";
 import { IoMdSend } from "react-icons/io";
 import { IoMdMic } from "react-icons/io";
 import { PiSpeakerHighFill } from "react-icons/pi";
-import { BiSolidLike, BiSolidDislike } from "react-icons/bi";
 import backgroundImage from "../assests/chatBackground.jpg";
 import VideoModal from "../components/VideoModal";
 import ChatSkeleton from "../components/ChatSkeleton";
@@ -41,22 +40,33 @@ function ChatPage() {
     window.mozSpeechRecognition ||
     window.msSpeechRecognition)();
   const [botResponse, setBotResponse] = useState(null);
-  const [isLiked, setIsLiked] = useState(false);
-  const [isDisliked, setIsDisliked] = useState(false);
   const [utterance, setUtterance] = useState(null);
-  const [speakOutAnswer, setSpeakOutAnswer] = useState("");
+  // const [speakOutAnswer, setSpeakOutAnswer] = useState("");
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isLoading, setisLoading] = useState(false);
 
-  const handleLikeClick = () => {
-    setIsLiked(true);
-    setIsDisliked(false);
+  const handleReaction = (message, reactionType) => {
+    const updatedMessages = messages.map((msg) => {
+      if (msg === message) {
+        const updatedReactions = { ...msg.reactions };
+  
+        if (reactionType === 'thumbsUp') {
+          updatedReactions.thumbsUp = updatedReactions.thumbsUp === 1 ? 0 : 1;
+          updatedReactions.thumbsDown = updatedReactions.thumbsDown === 1 ? 0 : 0;
+        } else if (reactionType === 'thumbsDown') {
+          updatedReactions.thumbsDown = updatedReactions.thumbsDown === 1 ? 0 : 1;
+          updatedReactions.thumbsUp = updatedReactions.thumbsUp === 1 ? 0 : 0;
+        }
+  
+        return { ...msg, reactions: updatedReactions };
+      }
+      return msg;
+    });
+  
+    setMessages(updatedMessages);
   };
+  
 
-  const handleDislikeClick = () => {
-    setIsLiked(false);
-    setIsDisliked(true);
-  };
 
   useEffect(() => {
     msgEnd.current.scrollIntoView();
@@ -124,7 +134,7 @@ function ChatPage() {
       );
 
       const answer = response.data.message;
-      setSpeakOutAnswer(answer);
+      // setSpeakOutAnswer(answer);
 
       const botResponse = {
         text: answer,
@@ -169,20 +179,22 @@ function ChatPage() {
     setShowDropdown(false);
   };
 
-  const handleNarrationClick = () => {
+  const handleNarrationClick = (message) => {
     const synth = window.speechSynthesis;
+  
     if (isSpeaking) {
       if (synth.speaking) {
         synth.cancel();
         setIsSpeaking(false);
       }
     } else {
-      const newUtterance = new SpeechSynthesisUtterance(speakOutAnswer);
+      const newUtterance = new SpeechSynthesisUtterance(message.text);
       setUtterance(newUtterance);
       synth.speak(newUtterance);
       setIsSpeaking(true);
     }
   };
+  
 
   useEffect(() => {
     const handleEnd = () => {
@@ -290,7 +302,7 @@ function ChatPage() {
                         className={`text-lg cursor-pointer ${
                           isSpeaking ? "active" : ""
                         }`}
-                        onClick={handleNarrationClick}
+                        onClick={()=>{handleNarrationClick(message)}}
                       />
                     </div>
                   )}
@@ -303,20 +315,22 @@ function ChatPage() {
                   {
                     <div className="flex mt-2">
                       {message.isBot && message.reactions && (
-                        <div className="flex">
-                          <BiSolidLike
-                            className={`text-lg ml-2 mr-2 cursor-pointer ${
-                              isLiked ? "text-[#668c6e]" : "text-[#c9e1cd]"
-                            }`}
-                            onClick={handleLikeClick}
-                          />
-                          <BiSolidDislike
-                            className={`text-lg mr-2 cursor-pointer ${
-                              isDisliked ? "text-[#668c6e]" : "text-[#c9e1cd]"
-                            }`}
-                            onClick={handleDislikeClick}
-                          />
-                        </div>
+                        <>
+                          <button
+                            onClick={() => handleReaction(message, "thumbsUp")}
+                            className="text-lg mr-2"
+                          >
+                            👍 {message.reactions.thumbsUp}
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleReaction(message, "thumbsDown")
+                            }
+                            className="text-lg mr-2"
+                          >
+                            👎 {message.reactions.thumbsDown}
+                          </button>
+                        </>
                       )}
                     </div>
                   }
