@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Eng from "../assests/engineer-removebg-preview.png";
 import Logo from "../assests/knowhiveLogo.png";
 import userLogo from "../assests/UserLogo.png";
@@ -33,7 +33,8 @@ function ChatPage() {
 
   const [showModal, setShowModal] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(false);
+  // const [showDropdown, setShowDropdown] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const recognition = new (window.SpeechRecognition ||
     window.webkitSpeechRecognition ||
@@ -49,24 +50,24 @@ function ChatPage() {
     const updatedMessages = messages.map((msg) => {
       if (msg === message) {
         const updatedReactions = { ...msg.reactions };
-  
-        if (reactionType === 'thumbsUp') {
+
+        if (reactionType === "thumbsUp") {
           updatedReactions.thumbsUp = updatedReactions.thumbsUp === 1 ? 0 : 1;
-          updatedReactions.thumbsDown = updatedReactions.thumbsDown === 1 ? 0 : 0;
-        } else if (reactionType === 'thumbsDown') {
-          updatedReactions.thumbsDown = updatedReactions.thumbsDown === 1 ? 0 : 1;
+          updatedReactions.thumbsDown =
+            updatedReactions.thumbsDown === 1 ? 0 : 0;
+        } else if (reactionType === "thumbsDown") {
+          updatedReactions.thumbsDown =
+            updatedReactions.thumbsDown === 1 ? 0 : 1;
           updatedReactions.thumbsUp = updatedReactions.thumbsUp === 1 ? 0 : 0;
         }
-  
+
         return { ...msg, reactions: updatedReactions };
       }
       return msg;
     });
-  
+
     setMessages(updatedMessages);
   };
-  
-
 
   useEffect(() => {
     msgEnd.current.scrollIntoView();
@@ -166,8 +167,8 @@ function ChatPage() {
     if (e.key === "Enter") await handleSend();
   };
 
-  const handleDropdownToggle = () => {
-    setShowDropdown(!showDropdown);
+  const handleAboutus = () => {
+    navigate("/about-us");
   };
 
   const handleLogout = () => {
@@ -176,12 +177,12 @@ function ChatPage() {
   };
 
   const closeDropdown = () => {
-    setShowDropdown(false);
+    setOpenDropdown(false);
   };
 
   const handleNarrationClick = (message) => {
     const synth = window.speechSynthesis;
-  
+
     if (isSpeaking) {
       if (synth.speaking) {
         synth.cancel();
@@ -194,7 +195,6 @@ function ChatPage() {
       setIsSpeaking(true);
     }
   };
-  
 
   useEffect(() => {
     const handleEnd = () => {
@@ -218,7 +218,6 @@ function ChatPage() {
       animate={{ scaleY: 1 }}
       exit={{ scaleY: 0 }}
       transition={{ duration: 0.5 }}
-      onPointerLeave={closeDropdown}
     >
       <div>
         <div className="absolute right-6 top-1">
@@ -228,44 +227,50 @@ function ChatPage() {
             width="42"
             height={100}
             onClick={() => {
-              handleDropdownToggle();
+              setOpenDropdown((prev) => !prev);
             }}
             className="cursor-pointer"
           />
-          {showDropdown && (
-            <div
-              className="absolute top-14 right-0 bg-[#FFFFFF] border border-gray-400 rounded-md shadow-md p-2 w-32"
-              style={{ zIndex: 10 }}
-            >
-              <div className="flex flex-col items-center dropdownlist">
-                <button
-                  onClick={() => setShowModal(true)}
-                  className="border font-poppins font-bold text-sm text-black p-2 border-none"
+          {openDropdown && (
+            <div className="absolute top-14 right-0 bg-[#FFFFFF] border border-gray-400 rounded-md shadow-md p-2 w-32 z-10">
+              <ul className="flex flex-col items-center dropdownlist">
+                <li
+                  onClick={() => {
+                    setShowModal(true);
+                    closeDropdown();
+                  }}
+                  className="font-poppins font-bold text-sm text-black p-2 cursor-pointer"
                 >
                   Chat History
-                </button>
-
-                <button
-                  onClick={() => setShowVideoModal(true)}
-                  className="border font-poppins font-bold text-sm  text-black p-2 border-none"
+                </li>
+                <li
+                  onClick={() => {
+                    setShowVideoModal(true);
+                    closeDropdown();
+                  }}
+                  className="font-poppins font-bold text-sm text-black p-2 cursor-pointer"
                 >
                   Video Demo
-                </button>
-
-                <Link
-                  to="/about-us"
-                  className="border font-poppins font-bold text-sm text-black p-2 border-none"
+                </li>
+                <li
+                  onClick={() => {
+                    handleAboutus();
+                    closeDropdown();
+                  }}
+                  className="font-poppins font-bold text-sm text-black p-2 cursor-pointer"
                 >
                   About Us
-                </Link>
-
-                <button
-                  onClick={handleLogout}
-                  className="border font-poppins font-bold text-sm text-black p-2 border-none"
+                </li>
+                <li
+                  onClick={() => {
+                    handleLogout();
+                    closeDropdown();
+                  }}
+                  className="font-poppins font-bold text-sm text-black p-2 cursor-pointer"
                 >
                   Logout
-                </button>
-              </div>
+                </li>
+              </ul>
             </div>
           )}
         </div>
@@ -302,7 +307,9 @@ function ChatPage() {
                         className={`text-lg cursor-pointer ${
                           isSpeaking ? "active" : ""
                         }`}
-                        onClick={()=>{handleNarrationClick(message)}}
+                        onClick={() => {
+                          handleNarrationClick(message);
+                        }}
                       />
                     </div>
                   )}

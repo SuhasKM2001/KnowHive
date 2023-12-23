@@ -302,11 +302,8 @@ def ask():
 
         # Fetch only the most recent conversation history entry for the user
         user_conversation_history = ConversationHistory.query.filter_by(user_id=current_user.id).order_by(ConversationHistory.id.desc()).first()
-        if user_conversation_history:
-            # Return the answer in the response
-            return jsonify({'message': new_answer["answer"]}), 200
-        else:
-            return jsonify({'error': 'No conversation history found'}), 404
+
+        return jsonify({'message': new_answer["answer"]}), 200
 
     # If no question has been asked yet, return an error
     return jsonify({'error': 'Invalid request'}), 400

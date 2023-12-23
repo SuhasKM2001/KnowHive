@@ -9,12 +9,12 @@ function ChatHistoryModal({ isVisible, onClose }) {
 
   useEffect(() => {
     // Fetch conversation history when the modal is opened
-    console.log("Fetching conversation history...");
+    // console.log("Fetching conversation history...");
 
     if (isVisible) {
       // const storedUser = JSON.parse(localStorage.getItem("user"));
       const token = localStorage.getItem("token");
-      console.log("Token-", token);
+      // console.log("Token-", token);
       axios
         .get("http://127.0.0.1:5000/conversation-history", {
           headers: {
@@ -22,7 +22,7 @@ function ChatHistoryModal({ isVisible, onClose }) {
           },
         })
         .then((response) => {
-          console.log("conversation history response", response);
+          // console.log("conversation history response", response);
 
           // Check if the response contains 'history' key
           if ("history" in response.data) {
