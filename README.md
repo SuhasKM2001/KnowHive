@@ -73,3 +73,15 @@ Display of Chat Modal
 <img width="960" alt="Video Modal" src="https://github.com/SuhasKM2001/KnowHive/assets/67571677/47a488f9-f944-4f5e-a61e-3da1298bf4bf">
 Display of Video Modal
 </p>
+
+## Glimpse of Database ##
+
+<p align="center">
+<img width="960" alt="conversation_history" src="https://github.com/SuhasKM2001/KnowHive/assets/67571677/889bd881-4bcd-4033-9c49-64cbb5d73e5e">
+Display of conversation_history table in MySQL Database
+</p>
+
+<p align="center">
+<img width="960" alt="user" src="https://github.com/SuhasKM2001/KnowHive/assets/67571677/8d1b6cc1-0713-4a0b-a04f-d605257dbeb7">
+Display of user table in MySQL Database
+</p>
