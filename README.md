@@ -16,7 +16,7 @@ Welcome to the KnowHive repository! This React-based frontend application allows
 ## Getting Started ##
 To run the KnowHive assistant Application locally, follow these steps:
 1. Clone the repository:
-`git clone`
+`git clone "https://github.com/SuhasKM2001/KnowHive.git"`
 
 2. Navigate to the project directory:
 `cd KnowHive`
