@@ -70,7 +70,7 @@ Display of Chat Modal
 </p>
 
 <p align="center">
-<img width="960" alt="Video Modal" src="https://github.com/SuhasKM2001/KnowHive/assets/67571677/47a488f9-f944-4f5e-a61e-3da1298bf4bf">
+<img width="960" alt="Video Modal" src="https://github.com/SuhasKM2001/KnowHive/assets/67571677/dd0a7628-4480-411e-b23d-4427aac146dd">
 Display of Video Modal
 </p>
 
