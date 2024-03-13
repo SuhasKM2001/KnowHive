@@ -85,3 +85,4 @@ Display of conversation_history table in MySQL Database
 <img width="960" alt="user" src="https://github.com/SuhasKM2001/KnowHive/assets/67571677/8d1b6cc1-0713-4a0b-a04f-d605257dbeb7">
 Display of user table in MySQL Database
 </p>
+
